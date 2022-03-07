@@ -1,0 +1,11 @@
+base:
+  seerbit:
+    url: https://staging.seerbitapigateway.com/fcmb/api/v1/
+
+spring:
+  data:
+    mongodb:
+      database: seerbit
+      host: localhost
+      port: 27017
+    

@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "base.seerbit.url",
+    "type": "java.lang.String",
+    "description": "A description for 'base.seerbit.url'"
+  },
+  {
+    "name": "base.seerbit.url",
+    "type": "java.lang.String",
+    "description": "A description for 'base.seerbit.url'"
+  }
+]}
