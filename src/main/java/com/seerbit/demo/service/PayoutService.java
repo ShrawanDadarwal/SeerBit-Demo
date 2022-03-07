@@ -1,20 +1,21 @@
-
+package com.seerbit.demo.service;
 
 
 
 import java.io.IOException;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.seerbit.demo.model.FCMBCashPickUp;
+import com.seerbit.demo.model.TransactionStatus;
 import com.seerbit.demo.payoutAPIService.PayoutAPICallService;
+import com.seerbit.demo.repository.CommonResponseRepository;
+import com.seerbit.demo.repository.FcmbCashPickUpRepository;
+import com.seerbit.demo.repository.TransactionStatusRepository;
+import com.seerbit.demo.response.CommonResponse;
 
-import main.java.com.seerbit.demo.model.FCMBCashPickUp;
-import main.java.com.seerbit.demo.model.TransactionStatus;
-import main.java.com.seerbit.demo.repository.CommonResponseRepository;
-import main.java.com.seerbit.demo.repository.FcmbCashPickUpRepository;
-import main.java.com.seerbit.demo.repository.TransactionStatusRepository;
-import main.java.com.seerbit.demo.response.CommonResponse;
 import retrofit2.Call;
 
 @Service
@@ -38,11 +39,18 @@ public class PayoutService {
 		try {
 			Call<TransactionStatus> checkStatus = payoutAPICallService.checkStatus(authenticationToekn,reference);
 			TransactionStatus transactionSatus = checkStatus.execute().body();
-			TransactionStatus findByReference = transactionStatusRepository.findByReference(transactionSatus.getTransaction().getReference());
+			TransactionStatus findByReference=null;
+			if(transactionSatus.getTransaction().getReference() != null) {
+				findByReference = transactionStatusRepository.findByReference(transactionSatus.getTransaction().getReference());
+			}
 			if(findByReference != null) {
 				updateModelByLatestResponse(transactionSatus, findByReference); //update document if reference id is not unique
 			}
-			execute =  transactionStatusRepository.save(findByReference);
+			if(findByReference != null) {
+				execute =  transactionStatusRepository.save(findByReference);
+			}else {
+				execute = transactionSatus;
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
