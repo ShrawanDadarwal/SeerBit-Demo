@@ -46,10 +46,10 @@ public class PayoutService {
 			if(findByReference != null) {
 				updateModelByLatestResponse(transactionSatus, findByReference); //update document if reference id is not unique
 			}
-			if(findByReference != null) {
-				execute =  transactionStatusRepository.save(findByReference);
+			if(findByReference == null) {
+				execute =  transactionStatusRepository.save(transactionSatus);
 			}else {
-				execute = transactionSatus;
+				execute =  transactionStatusRepository.save(findByReference);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -93,12 +93,7 @@ public class PayoutService {
 			if( commonResponseDatabase == null && commonResponse.getTransaction().getReference() != null) {
 				commonResponseRepository.save(commonResponse);
 			}
-			/*
-			 * else if((fcmCashPickUpDatabase != null &&
-			 * commonResponseDatabase.getTransaction().getReference() != null)) {
-			 * fcmbCashPickUpRepository.save(fcmCashPickUpDatabase);
-			 * commonResponseRepository.save(commonResponseDatabase); }
-			 */
+			
 			
 		} catch (IOException e) {
 			e.printStackTrace();
