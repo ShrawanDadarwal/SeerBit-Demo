@@ -2,6 +2,7 @@ package com.seerbit.demo.payoutAPIService;
 
 
 
+import com.seerbit.demo.model.AcPayoutToNigeria;
 import com.seerbit.demo.model.FCMBCashPickUp;
 import com.seerbit.demo.model.TransactionStatus;
 import com.seerbit.demo.response.CommonResponse;
@@ -19,4 +20,8 @@ public interface PayoutAPICallService {
 	 
 	 @POST("payout/create")
 	 Call<CommonResponse> createFCMBCashPickUp(@Header("Authorization") String accessToken,@Body FCMBCashPickUp fcmbCashPickUp);
+	 
+
+	 @POST("account/payout")
+	 Call<CommonResponse> accountPayoutToNigeria(@Header("Authorization") String accessToken,@Body AcPayoutToNigeria acPayoutToNigeria);
 }

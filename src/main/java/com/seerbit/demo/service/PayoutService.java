@@ -1,16 +1,15 @@
 package com.seerbit.demo.service;
 
-
-
 import java.io.IOException;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.seerbit.demo.model.AcPayoutToNigeria;
 import com.seerbit.demo.model.FCMBCashPickUp;
 import com.seerbit.demo.model.TransactionStatus;
 import com.seerbit.demo.payoutAPIService.PayoutAPICallService;
+import com.seerbit.demo.repository.AccountPayoutToNigeriaRepository;
 import com.seerbit.demo.repository.CommonResponseRepository;
 import com.seerbit.demo.repository.FcmbCashPickUpRepository;
 import com.seerbit.demo.repository.TransactionStatusRepository;
@@ -20,41 +19,46 @@ import retrofit2.Call;
 
 @Service
 public class PayoutService {
-	
+
 	@Autowired
 	private PayoutAPICallService payoutAPICallService;
-	
+
 	@Autowired
 	private TransactionStatusRepository transactionStatusRepository;
-	
+
 	@Autowired
 	private FcmbCashPickUpRepository fcmbCashPickUpRepository;
-	
+
 	@Autowired
 	private CommonResponseRepository commonResponseRepository;
-	
+
+	@Autowired
+	private AccountPayoutToNigeriaRepository accountPayoutToNigeriaRepository;
+
 	public TransactionStatus checkTransactionStatus(String reference, String authenticationToekn) {
-		
-		TransactionStatus execute=null;
+
+		TransactionStatus execute = null;
 		try {
-			Call<TransactionStatus> checkStatus = payoutAPICallService.checkStatus(authenticationToekn,reference);
+			Call<TransactionStatus> checkStatus = payoutAPICallService.checkStatus(authenticationToekn, reference);
 			TransactionStatus transactionSatus = checkStatus.execute().body();
-			TransactionStatus findByReference=null;
-			if(transactionSatus.getTransaction().getReference() != null) {
-				findByReference = transactionStatusRepository.findByReference(transactionSatus.getTransaction().getReference());
+			TransactionStatus findByReference = null;
+			if (transactionSatus.getTransaction().getReference() != null) {
+				findByReference = transactionStatusRepository
+						.findByReference(transactionSatus.getTransaction().getReference());
 			}
-			if(findByReference != null) {
-				updateModelByLatestResponse(transactionSatus, findByReference); //update document if reference id is not unique
+			if (findByReference != null) {
+				updateModelByLatestResponse(transactionSatus, findByReference); // update document if reference id is
+																				// not unique
 			}
-			if(findByReference == null) {
-				execute =  transactionStatusRepository.save(transactionSatus);
-			}else {
-				execute =  transactionStatusRepository.save(findByReference);
+			if (findByReference == null) {
+				execute = transactionStatusRepository.save(transactionSatus);
+			} else {
+				execute = transactionStatusRepository.save(findByReference);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		 return execute;
+		return execute;
 	}
 
 	private void updateModelByLatestResponse(TransactionStatus transactionSatus, TransactionStatus findByReference) {
@@ -68,33 +72,36 @@ public class PayoutService {
 
 	public Object createFcmbCashPickUp(FCMBCashPickUp fcmbCashPickUp, String authorizationToken) {
 		CommonResponse commonResponse = null;
-		
-		try{
-			FCMBCashPickUp fcmCashPickUpDatabase = fcmbCashPickUpRepository.findByReference(fcmbCashPickUp.getTransaction().getReference());
-			commonResponse = payoutAPICallService.createFCMBCashPickUp(authorizationToken, fcmbCashPickUp).execute().body();
+
+		try {
+			FCMBCashPickUp fcmCashPickUpDatabase = fcmbCashPickUpRepository
+					.findByReference(fcmbCashPickUp.getTransaction().getReference());
+			commonResponse = payoutAPICallService.createFCMBCashPickUp(authorizationToken, fcmbCashPickUp).execute()
+					.body();
 			CommonResponse commonResponseDatabase = null;
-			if(commonResponse.getTransaction().getReference() != null) {
-				 commonResponseDatabase = commonResponseRepository.findByReference(commonResponse.getTransaction().getReference());
+			if (commonResponse.getTransaction().getReference() != null) {
+				commonResponseDatabase = commonResponseRepository
+						.findByReference(commonResponse.getTransaction().getReference());
 			}
-			
-			if(fcmCashPickUpDatabase != null) {
-				updateFcmbCashPickUp(fcmbCashPickUp, fcmCashPickUpDatabase); // Update Cash Pick Up reference-No is Non Unique
+
+			if (fcmCashPickUpDatabase != null) {
+				updateFcmbCashPickUp(fcmbCashPickUp, fcmCashPickUpDatabase); // Update Cash Pick Up reference-No is Non
+																				// Unique
 			}
-			if(commonResponseDatabase != null) { // Update Common Response if reference-No is Non Unique
+			if (commonResponseDatabase != null) { // Update Common Response if reference-No is Non Unique
 				commonResponseDatabase.setCode(commonResponse.getCode());
 				commonResponseDatabase.setMessage(commonResponse.getMessage());
 				commonResponseDatabase.setTransaction(commonResponse.getTransaction());
 			}
-			if(fcmCashPickUpDatabase==null) {
+			if (fcmCashPickUpDatabase == null) {
 				fcmbCashPickUpRepository.save(fcmbCashPickUp);
-				
+
 			}
-			
-			if( commonResponseDatabase == null && commonResponse.getTransaction().getReference() != null) {
+
+			if (commonResponseDatabase == null && commonResponse.getTransaction().getReference() != null) {
 				commonResponseRepository.save(commonResponse);
 			}
-			
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -106,5 +113,32 @@ public class PayoutService {
 		fcmCashPickUpDatabase.setOrder(fcmbCashPickUp.getOrder());
 		fcmCashPickUpDatabase.setTransaction(fcmbCashPickUp.getTransaction());
 		fcmCashPickUpDatabase.setSource(fcmbCashPickUp.getSource());
+	}
+
+	public CommonResponse createAccoutPayoutToNigeria(AcPayoutToNigeria acPayoutToNigeria, String authorizationToken) {
+		CommonResponse commonResponse = null;
+		try {
+			commonResponse = payoutAPICallService
+					.accountPayoutToNigeria(authorizationToken, acPayoutToNigeria).execute().body();
+			AcPayoutToNigeria accountPayoutToNigeriaDatabse = null;
+			CommonResponse commonResponseDatabase = null;
+			if (commonResponse.getTransaction().getReference() != null) {
+				accountPayoutToNigeriaDatabse = accountPayoutToNigeriaRepository
+						.findByReference(commonResponse.getTransaction().getReference());
+				commonResponseDatabase = commonResponseRepository
+						.findByReference(commonResponse.getTransaction().getReference());
+			}
+			if (accountPayoutToNigeriaDatabse == null && commonResponse.getTransaction().getReference() != null) {
+				accountPayoutToNigeriaRepository.save(acPayoutToNigeria);
+			}
+			if (commonResponseDatabase == null && commonResponse.getTransaction().getReference() != null) {
+				commonResponseRepository.save(commonResponse);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+//		accountPayoutToNigeria
+		return commonResponse;
 	}
 }

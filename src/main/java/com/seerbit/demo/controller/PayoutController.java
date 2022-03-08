@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.seerbit.demo.model.AcPayoutToNigeria;
 import com.seerbit.demo.model.FCMBCashPickUp;
 import com.seerbit.demo.service.PayoutService;
 
@@ -35,5 +36,11 @@ public class PayoutController {
 			@RequestHeader("Authorization") String authorizationToken) {
 		return new ResponseEntity<>(HttpStatus.CREATED).ok(payoutService.createFcmbCashPickUp(fcmbCashPickUp, authorizationToken));
 	}
-
+	
+	@SuppressWarnings("static-access")
+	@PostMapping("/account/payout")
+	public ResponseEntity<?> createAccoutPayoutToNigeria(@RequestBody AcPayoutToNigeria acPayoutToNigeria,
+			@RequestHeader("Authorization") String authorizationToken) {
+		return new ResponseEntity<>(HttpStatus.CREATED).ok(payoutService.createAccoutPayoutToNigeria(acPayoutToNigeria, authorizationToken));
+	}
 }
