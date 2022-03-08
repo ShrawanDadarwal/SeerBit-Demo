@@ -85,11 +85,20 @@ public class PayoutService {
 				commonResponseDatabase.setMessage(commonResponse.getMessage());
 				commonResponseDatabase.setTransaction(commonResponse.getTransaction());
 			}
-			
-			if(fcmbCashPickUp != null && commonResponse.getTransaction().getReference() != null) {
-				fcmbCashPickUpRepository.save(fcmCashPickUpDatabase);
-				commonResponseRepository.save(commonResponseDatabase);
+			if(fcmCashPickUpDatabase==null) {
+				fcmbCashPickUpRepository.save(fcmbCashPickUp);
+				
 			}
+			
+			if( commonResponseDatabase == null && commonResponse.getTransaction().getReference() != null) {
+				commonResponseRepository.save(commonResponse);
+			}
+			/*
+			 * else if((fcmCashPickUpDatabase != null &&
+			 * commonResponseDatabase.getTransaction().getReference() != null)) {
+			 * fcmbCashPickUpRepository.save(fcmCashPickUpDatabase);
+			 * commonResponseRepository.save(commonResponseDatabase); }
+			 */
 			
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -1,26 +1,17 @@
 package com.seerbit.demo.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class FCMBTransaction {
 
 	private String reference;
-
-	public String getReference() {
-		return reference;
-	}
-
-	public void setReference(String reference) {
-		this.reference = reference;
-	}
-
-	@Override
-	public String toString() {
-		return "FCMBTransaction [reference=" + reference + "]";
-	}
-
 }

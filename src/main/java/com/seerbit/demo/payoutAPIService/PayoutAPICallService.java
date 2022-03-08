@@ -2,8 +2,6 @@ package com.seerbit.demo.payoutAPIService;
 
 
 
-import org.springframework.stereotype.Repository;
-
 import com.seerbit.demo.model.FCMBCashPickUp;
 import com.seerbit.demo.model.TransactionStatus;
 import com.seerbit.demo.response.CommonResponse;
