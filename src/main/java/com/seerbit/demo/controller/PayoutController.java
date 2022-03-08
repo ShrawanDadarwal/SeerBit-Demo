@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.seerbit.demo.model.AcPayoutToNigeria;
 import com.seerbit.demo.model.FCMBCashPickUp;
+import com.seerbit.demo.model.WalletPayout;
 import com.seerbit.demo.service.PayoutService;
 
 import lombok.RequiredArgsConstructor;
@@ -42,5 +43,12 @@ public class PayoutController {
 	public ResponseEntity<?> createAccoutPayoutToNigeria(@RequestBody AcPayoutToNigeria acPayoutToNigeria,
 			@RequestHeader("Authorization") String authorizationToken) {
 		return new ResponseEntity<>(HttpStatus.CREATED).ok(payoutService.createAccoutPayoutToNigeria(acPayoutToNigeria, authorizationToken));
+	}
+	
+	@SuppressWarnings("static-access")
+	@PostMapping("/wallet/account/payout")
+	public ResponseEntity<?> createWalletPayout(@RequestBody WalletPayout walletPayout,
+			@RequestHeader("Authorization") String authorizationToken) {
+		return new ResponseEntity<>(HttpStatus.CREATED).ok(payoutService.createWalletPayout(walletPayout, authorizationToken));
 	}
 }

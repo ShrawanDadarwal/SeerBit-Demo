@@ -5,6 +5,7 @@ package com.seerbit.demo.payoutAPIService;
 import com.seerbit.demo.model.AcPayoutToNigeria;
 import com.seerbit.demo.model.FCMBCashPickUp;
 import com.seerbit.demo.model.TransactionStatus;
+import com.seerbit.demo.model.WalletPayout;
 import com.seerbit.demo.response.CommonResponse;
 
 import retrofit2.Call;
@@ -24,4 +25,7 @@ public interface PayoutAPICallService {
 
 	 @POST("account/payout")
 	 Call<CommonResponse> accountPayoutToNigeria(@Header("Authorization") String accessToken,@Body AcPayoutToNigeria acPayoutToNigeria);
+	 
+	 @POST("account/payout")
+	 Call<CommonResponse> walletPayout(@Header("Authorization") String accessToken,@Body WalletPayout walletPayout);
 }

@@ -8,11 +8,13 @@ import org.springframework.stereotype.Service;
 import com.seerbit.demo.model.AcPayoutToNigeria;
 import com.seerbit.demo.model.FCMBCashPickUp;
 import com.seerbit.demo.model.TransactionStatus;
+import com.seerbit.demo.model.WalletPayout;
 import com.seerbit.demo.payoutAPIService.PayoutAPICallService;
 import com.seerbit.demo.repository.AccountPayoutToNigeriaRepository;
 import com.seerbit.demo.repository.CommonResponseRepository;
 import com.seerbit.demo.repository.FcmbCashPickUpRepository;
 import com.seerbit.demo.repository.TransactionStatusRepository;
+import com.seerbit.demo.repository.WalletPayoutRepository;
 import com.seerbit.demo.response.CommonResponse;
 
 import retrofit2.Call;
@@ -34,6 +36,9 @@ public class PayoutService {
 
 	@Autowired
 	private AccountPayoutToNigeriaRepository accountPayoutToNigeriaRepository;
+	
+	@Autowired
+	private WalletPayoutRepository walletPayoutRepository;
 
 	public TransactionStatus checkTransactionStatus(String reference, String authenticationToekn) {
 
@@ -138,7 +143,32 @@ public class PayoutService {
 			e.printStackTrace();
 		}
 
-//		accountPayoutToNigeria
+		return commonResponse;
+	}
+
+	public CommonResponse createWalletPayout(WalletPayout walletPayout, String authorizationToken) {
+		CommonResponse commonResponse = null;
+		try {
+			commonResponse = payoutAPICallService
+					.walletPayout(authorizationToken, walletPayout).execute().body();
+			WalletPayout walletPayoutDatabase = null;
+			CommonResponse commonResponseDatabase = null;
+			if (commonResponse.getTransaction().getReference() != null) {
+				walletPayoutDatabase = walletPayoutRepository
+						.findByReference(commonResponse.getTransaction().getReference());
+				commonResponseDatabase = commonResponseRepository
+						.findByReference(commonResponse.getTransaction().getReference());
+			}
+			if (walletPayoutDatabase == null && commonResponse.getTransaction().getReference() != null) {
+				walletPayoutRepository.save(walletPayout);
+			}
+			if (commonResponseDatabase == null && commonResponse.getTransaction().getReference() != null) {
+				commonResponseRepository.save(commonResponse);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		return commonResponse;
 	}
 }
