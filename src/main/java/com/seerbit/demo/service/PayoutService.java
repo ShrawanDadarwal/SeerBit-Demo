@@ -11,10 +11,12 @@ import com.seerbit.demo.model.TransactionStatus;
 import com.seerbit.demo.model.WalletPayout;
 import com.seerbit.demo.payoutAPIService.PayoutAPICallService;
 import com.seerbit.demo.repository.AccountPayoutToNigeriaRepository;
+import com.seerbit.demo.repository.CancelCashPickUpRepository;
 import com.seerbit.demo.repository.CommonResponseRepository;
 import com.seerbit.demo.repository.FcmbCashPickUpRepository;
 import com.seerbit.demo.repository.TransactionStatusRepository;
 import com.seerbit.demo.repository.WalletPayoutRepository;
+import com.seerbit.demo.response.CancelCashPickUpResponse;
 import com.seerbit.demo.response.CommonResponse;
 
 import retrofit2.Call;
@@ -36,9 +38,12 @@ public class PayoutService {
 
 	@Autowired
 	private AccountPayoutToNigeriaRepository accountPayoutToNigeriaRepository;
-	
+
 	@Autowired
 	private WalletPayoutRepository walletPayoutRepository;
+
+	@Autowired
+	private CancelCashPickUpRepository cancelCashPickUpRepository;
 
 	public TransactionStatus checkTransactionStatus(String reference, String authenticationToekn) {
 
@@ -123,8 +128,8 @@ public class PayoutService {
 	public CommonResponse createAccoutPayoutToNigeria(AcPayoutToNigeria acPayoutToNigeria, String authorizationToken) {
 		CommonResponse commonResponse = null;
 		try {
-			commonResponse = payoutAPICallService
-					.accountPayoutToNigeria(authorizationToken, acPayoutToNigeria).execute().body();
+			commonResponse = payoutAPICallService.accountPayoutToNigeria(authorizationToken, acPayoutToNigeria)
+					.execute().body();
 			AcPayoutToNigeria accountPayoutToNigeriaDatabse = null;
 			CommonResponse commonResponseDatabase = null;
 			if (commonResponse.getTransaction().getReference() != null) {
@@ -149,8 +154,7 @@ public class PayoutService {
 	public CommonResponse createWalletPayout(WalletPayout walletPayout, String authorizationToken) {
 		CommonResponse commonResponse = null;
 		try {
-			commonResponse = payoutAPICallService
-					.walletPayout(authorizationToken, walletPayout).execute().body();
+			commonResponse = payoutAPICallService.walletPayout(authorizationToken, walletPayout).execute().body();
 			WalletPayout walletPayoutDatabase = null;
 			CommonResponse commonResponseDatabase = null;
 			if (commonResponse.getTransaction().getReference() != null) {
@@ -164,6 +168,65 @@ public class PayoutService {
 			}
 			if (commonResponseDatabase == null && commonResponse.getTransaction().getReference() != null) {
 				commonResponseRepository.save(commonResponse);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return commonResponse;
+	}
+
+	public CancelCashPickUpResponse cancelCashPickUpTransaction(FCMBCashPickUp fcmbCashPickUp,
+			String authorizationToken) {
+		CancelCashPickUpResponse cancelCashPickUpResponse = null;
+		try {
+			cancelCashPickUpResponse = payoutAPICallService
+					.cancelCashPickUpTransaction(authorizationToken, fcmbCashPickUp).execute().body();
+			FCMBCashPickUp fcmbCashPickUpDatabse = null;
+			CancelCashPickUpResponse cancelCashPickUpResponseDatabase = null;
+			if (cancelCashPickUpResponse != null) {
+				if (cancelCashPickUpResponse.getTransaction().getReference() != null) {
+					fcmbCashPickUpDatabse = fcmbCashPickUpRepository
+							.findByReference(cancelCashPickUpResponse.getTransaction().getReference());
+					cancelCashPickUpResponseDatabase = cancelCashPickUpRepository
+							.findByReference(cancelCashPickUpResponse.getTransaction().getReference());
+				}
+				if (fcmbCashPickUpDatabse == null && cancelCashPickUpResponse.getTransaction().getReference() != null) {
+					fcmbCashPickUpRepository.save(fcmbCashPickUp);
+				}
+				if (cancelCashPickUpResponseDatabase == null
+						&& cancelCashPickUpResponse.getTransaction().getReference() != null) {
+					cancelCashPickUpRepository.save(cancelCashPickUpResponse);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return cancelCashPickUpResponse;
+	}
+	public CommonResponse updateCashPickUpTransaction(FCMBCashPickUp fcmbCashPickUp,
+			String authorizationToken) {
+		CommonResponse commonResponse = null;
+		try {
+			commonResponse = payoutAPICallService
+					.updateCashPickUpTransaction(authorizationToken, fcmbCashPickUp).execute().body();
+			FCMBCashPickUp fcmbCashPickUpDatabse = null;
+			CommonResponse commonResponseDatabase = null;
+			if (commonResponse != null) {
+				if (commonResponse.getTransaction().getReference() != null) {
+					fcmbCashPickUpDatabse = fcmbCashPickUpRepository
+							.findByReference(commonResponse.getTransaction().getReference());
+					commonResponseDatabase = commonResponseRepository
+							.findByReference(commonResponse.getTransaction().getReference());
+				}
+				if (fcmbCashPickUpDatabse == null && commonResponse.getTransaction().getReference() != null) {
+					fcmbCashPickUpRepository.save(fcmbCashPickUp);
+				}
+				if (commonResponseDatabase == null
+						&& commonResponse.getTransaction().getReference() != null) {
+					commonResponseRepository.save(commonResponse);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

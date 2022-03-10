@@ -51,4 +51,18 @@ public class PayoutController {
 			@RequestHeader("Authorization") String authorizationToken) {
 		return new ResponseEntity<>(HttpStatus.CREATED).ok(payoutService.createWalletPayout(walletPayout, authorizationToken));
 	}
+	
+	@SuppressWarnings("static-access")
+	@PostMapping("/payout/cancel")
+	public ResponseEntity<?> cancelCashPickUpTransaction(@RequestBody FCMBCashPickUp fcmbCashPickUp,
+			@RequestHeader("Authorization") String authorizationToken) {
+		return new ResponseEntity<>(HttpStatus.CREATED).ok(payoutService.cancelCashPickUpTransaction(fcmbCashPickUp, authorizationToken));
+	}
+	
+	@SuppressWarnings("static-access")
+	@PostMapping("/payout/update")
+	public ResponseEntity<?> updateCashPickUpTransaction(@RequestBody FCMBCashPickUp fcmbCashPickUp,
+			@RequestHeader("Authorization") String authorizationToken) {
+		return new ResponseEntity<>(HttpStatus.CREATED).ok(payoutService.updateCashPickUpTransaction(fcmbCashPickUp, authorizationToken));
+	}
 }
